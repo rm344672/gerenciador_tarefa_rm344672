@@ -1,41 +1,43 @@
-import type {NextApiResponse, NextApiRequest} from 'next';
-import { DefaultMsgResponse } from '../../types/DefaultMsgResponse';
-import {UserModel} from '../../models/UserModel';
-import {connect} from '../../middlewares/connectToMongoDB';
+import type {NextApiRequest, NextApiResponse} from 'next';
+import { DefaultResponseMsg } from '../../types/DefaultResponseMsg';
+import { UserRequest } from '../../types/UserRequest';
+import { connectDb} from '../../middlewares/connectDb';
+import md5 from 'md5';
+import { UserModel } from '../../models/UserModel';
 
-const registerEndpoint = async (req: NextApiRequest, res: NextApiResponse<DefaultMsgResponse>) => {
-    try{
-        if(req.method?.toLocaleLowerCase() === 'post'){
-            const{nome, email, password} = req.body;
+const userEndpoint = async (req : NextApiRequest, res : NextApiResponse<DefaultResponseMsg>) => {
 
-            console.log(nome.trim < 2)
+    if(req.method === 'POST'){
+        const body = req.body as UserRequest;
 
-            if(!nome || nome.trim().length < 2){
-                return res.status(400).json({error: "Nome não é válido."})        
-            }
-
-            if(!email || email.trim().length < 5 || !email.includes('@') || !email.includes('.')){
-                return res.status(400).json({error: "Email não é válido."})        
-            }
-
-            if(!password || password.trim().length < 6){
-                return res.status(400).json({error: "Senha deve ter pelo menos 6 caracteres."})        
-            }
-
-            const user = {
-                nome,
-                email,
-                password
-            };
-
-            await UserModel.create(user);
-            return res.status(200).json({msg: "Usuário cadastrado com sucesso!"})
+        if(!body.name || body.name.length < 2 ){
+            return res.status(400).json({ error : 'Nome inválido'});
         }
-        return res.status(405).json({error: "Método informado não existe"})
-    }catch(e){
-        console.log('Error on create user: ', e);
-        return res.status(500).json({error: 'Houve um erro inesperado!'})
+
+        if(!body.email || body.email.length < 5 ){
+            return res.status(400).json({ error : 'Email inválido'});
+        }
+
+        if(!body.password || body.password.length < 4 ){
+            return res.status(400).json({ error : 'Senha inválida'});
+        }
+
+        const existingUserWithEmail = await UserModel.find({email : body.email});
+        if(existingUserWithEmail && existingUserWithEmail.length){
+            return res.status(400).json({ error : 'Já existe usuário com o email informado'});
+        }
+
+        const user = {
+            name : body.name,
+            email : body.email,
+            password : md5(body.password)
+        }
+
+        await UserModel.create(user);
+        return res.status(200).json({ msg : 'Usuario Criado'});
     }
+
+    return res.status(405).json({ error : 'Metodo infomado não é valido'});
 }
 
-export default connect(registerEndpoint);
+export default connectDb(userEndpoint);

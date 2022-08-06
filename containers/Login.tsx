@@ -1,13 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import React, {useState, MouseEvent} from 'react';
-import { executeRequest } from '../services/ApiService';
 import { NextPage } from 'next';
+import { AccessTokenProps } from '../types/AccessTokenProps';
+import { executeRequest } from '../services/apiServices';
 
-type LoginProps = {
-    setAccessToken(e: string): void
-}
-
-export const Login:NextPage<LoginProps> = ({setAccessToken}) => {
+export const Login:NextPage<AccessTokenProps> = ({setAccessToken}) => {
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
@@ -59,7 +56,7 @@ export const Login:NextPage<LoginProps> = ({setAccessToken}) => {
                     <input type="password" 
                         placeholder="Senha"
                         value={password}
-                        onChange={event => setPassword(event.target.value)} placeholder="Login"
+                        onChange={event => setPassword(event.target.value)}
                     />
                 </div>
                 <button onClick={doLogin}>Login</button>

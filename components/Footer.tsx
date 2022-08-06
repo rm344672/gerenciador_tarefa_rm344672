@@ -1,7 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 import React from 'react';
 
 export const Footer = () => {
     return (
-        <h1>Footer</h1>
+        <div className='container-footer'>
+            <button><img src="/icons/add.svg" alt="Adicionar tarefa" /> Adicionar Tarefa</button>
+            <span>© Copyright {new Date().getFullYear}. Todos os direitos reservados.</span>
+        </div>
     )
 }

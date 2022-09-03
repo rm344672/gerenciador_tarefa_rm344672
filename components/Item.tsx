@@ -16,11 +16,13 @@ export const Item:NextPage<ItemProps> = ({task, selectTaskToEdit}) => {
         if(finishDate){
             return `Concluído em: ${moment(finishDate).format('DD/MM/yyyy')}`;
         }
-        return `Previsão de conclusão em: ${moment(previsionDate).format('DD/MM/yyyy')}`;
+        return `Previsão em: ${moment(previsionDate).format('DD/MM/yyyy')}`;
     }
     
     return (
-        <div className={"container-item " + (task.finishDate? "" : "ativo")}>
+        <div className={"container-item " + (task.finishDate? "" : "ativo")}
+            onClick={() => {task.finishDate ? null : selectTaskToEdit(task)}}
+        >
             <img src={"/icons/" + (task.finishDate? 'checked.svg' : 'not-checked.svg')}
                 alt={task.finishDate? 'Atividade Concluída' : 'Atividade Ativa'}/>
             <div>
